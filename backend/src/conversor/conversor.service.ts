@@ -31,6 +31,8 @@ export class ConversorService {
 
   dedductions = {};
 
+  totalDonations = 0;
+
   index() {
     return `
       <form method="post" action="http://localhost:3000/conversor" enctype="multipart/form-data">
@@ -87,8 +89,10 @@ export class ConversorService {
     content = content.padEnd(107);
     content += `${MODEL}0000000000`;
     content += '  0000000000000'; // Campos 121-135
-    content += '000000903'; //TODO: Calcular donaciones. Campos 136-144
-    content += '000000040403107'; //TODO: Cacular donaciones totales. Campos 145-159
+    content += this.unique_nifs.size.toString().padStart(9, '0'); // Campo 136
+    // content += '000000040403107'; //TODO: Cacular donaciones totales. Campos 145-159
+    console.log(this.totalDonations);
+    content += this.computeDecimals(this.totalDonations.toString(), 13, 2);
     content += '1'; // Campo 160
     content = content.padEnd(250);
     content += '\n';
@@ -135,7 +139,12 @@ export class ConversorService {
     return filledIntegerPart + filledDecimalPart;
   }
 
+  unique_nifs = new Set();
+
   addDonation(row: any) {
+    if (!this.unique_nifs.has(row['N.I.F. / C.I.F.'])) {
+      this.unique_nifs.add(row['N.I.F. / C.I.F.']);
+    }
     var content = `2182${new Date().getFullYear() - 1}${this.nif}${row['N.I.F. / C.I.F.']}`;
     content = content.padEnd(35);
     if (row['Donante'].trim().length > 40) {
@@ -146,6 +155,9 @@ export class ConversorService {
     content += row['Cód. provincia'];
     content += 'A';
     var donation = row['DINERARIA'] ? row['DINERARIA'] : row['en ESPECIE'];
+    console.log(donation);
+    this.totalDonations += donation;
+    console.log(this.totalDonations);
     if (
       row['N.I.F. / C.I.F.'].charAt(0) === 'A' ||
       row['N.I.F. / C.I.F.'].charAt(0) === 'B'
@@ -224,7 +236,7 @@ export class ConversorService {
 
     const fileName = 'output.txt';
 
-    var content = this.createFirstLine(body, content);
+    var content = '';
 
     this.readDedductions(body);
 
@@ -235,6 +247,10 @@ export class ConversorService {
       content += this.addDonation(row);
       content += '\n';
     });
+
+    content = this.createFirstLine(body, content) + content;
+
+    console.log(this.unique_nifs.size);
     // console.log(content);
 
     // Define the path where the file will be temporarily saved
