@@ -1,7 +1,9 @@
 import { Body, HttpException, Injectable, UploadedFile } from '@nestjs/common';
 import * as XLSX from 'xlsx';
+import { Decimal } from 'decimal.js';
+import { writeFileSync } from 'fs';
+import { join } from 'path';
 import * as fs from 'fs';
-import * as path from 'path';
 
 const MODEL = 182;
 
@@ -31,67 +33,19 @@ export class ConversorService {
 
   dedductions = {};
 
-  totalDonations = 0;
+  totalDonations: number = 0;
+  numberOfDonations: number = 0;
 
-  index() {
-    return `
-      <form method="post" action="http://localhost:3000/conversor" enctype="multipart/form-data">
-        <label for="cif">CIF:</label>
-        <input type="num" id="cif" name="cif"><br><br>
-        <label for="repr">Representante:</label>
-        <input type="text" id="repr" name="repr"><br><br>
-        <label for="tel">Teléfono:</label>
-        <input type="num" id="tel" name="tel"><br><br>
-        <label for="poc">Punto de contacto:</label>
-        <input type="text" id="poc" name="poc"><br><br>
-        <label for="ded_and">Deducción Andalucía:</label>
-        <input type="num" id="ded_and" name="ded_and"><br><br>
-        <label for="ded_ar">Deducción Aragón:</label>
-        <input type="num" id="ded_ar" name="ded_ar"><br><br>
-        <label for="ded_ast">Deducción Asturias:</label>
-        <input type="num" id="ded_ast" name="ded_ast"><br><br>
-        <label for="ded_balears">Deducción Baleares:</label>
-        <input type="num" id="ded_balears" name="ded_balears"><br><br>
-        <label for="ded_canarias">Deducción Canarias:</label>
-        <input type="num" id="ded_canarias" name="ded_canarias"><br><br>
-        <label for="ded_cant">Deducción Cantabria:</label>
-        <input type="num" id="ded_cant" name="ded_cant"><br><br>
-        <label for="ded_clm">Deducción Castilla-La Mancha:</label>
-        <input type="num" id="ded_clm" name="ded_clm"><br><br>
-        <label for="ded_cyl">Deducción Castilla y León:</label>
-        <input type="num" id="ded_cyl" name="ded_cyl"><br><br>
-        <label for="ded_cat">Deducción Cataluña:</label>
-        <input type="num" id="ded_cat" name="ded_cat"><br><br>
-        <label for="ded_ext">Deducción Extremadura:</label>
-        <input type="num" id="ded_ext" name="ded_ext"><br><br>
-        <label for="ded_gal">Deducción Galicia:</label>
-        <input type="num" id="ded_gal" name="ded_gal"><br><br>
-        <label for="ded_mad">Deducción Madrid:</label>
-        <input type="num" id="ded_mad" name="ded_mad"><br><br>
-        <label for="ded_mur">Deducción Murcia:</label>
-        <input type="num" id="ded_mur" name="ded_mur"><br><br>
-        <label for="ded_rioja">Deducción La Rioja:</label>
-        <input type="num" id="ded_rioja" name="ded_rioja"><br><br>
-        <label for="ded_val">Deducción Comunidad Valenciana:</label>
-        <input type="num" id="ded_val" name="ded_val"><br><br>
-        <label for="file">File:</label>
-        <input type="file" id="file" name="file"><br><br>
-        <input type="submit" value="Submit">
-      </form>
-    `;
-  }
+  warnings: string[] = [];
 
-  createFirstLine(body: any, content: string) {
-    this.nif = body.cif;
-    content = `1${MODEL}${new Date().getFullYear() - 1}${this.nif}${body.repr}`;
+  createFirstLine(content: string, repr: string, tel: string, poc: string) {
+    content = `1${MODEL}${new Date().getFullYear() - 1}${this.nif}${repr}`;
     content = content.padEnd(57);
-    content += `T${body.tel}${body.poc}`;
+    content += `T${tel}${poc}`;
     content = content.padEnd(107);
     content += `${MODEL}0000000000`;
     content += '  0000000000000'; // Campos 121-135
-    content += this.unique_nifs.size.toString().padStart(9, '0'); // Campo 136
-    // content += '000000040403107'; //TODO: Cacular donaciones totales. Campos 145-159
-    console.log(this.totalDonations);
+    content += this.numberOfDonations.toString().padStart(9, '0'); // Campo 136
     content += this.computeDecimals(this.totalDonations.toString(), 13, 2);
     content += '1'; // Campo 160
     content = content.padEnd(250);
@@ -115,7 +69,10 @@ export class ConversorService {
       }
     }
 
-    console.log(townName, ' no encontrado');
+    // console.log(townName, ' no encontrado');
+    this.warnings.push(
+      '- ' + townName + ' no encontrado. Línea ' + (this.numberOfDonations + 1).toString(),
+    );
     return null;
   }
 
@@ -139,29 +96,31 @@ export class ConversorService {
     return filledIntegerPart + filledDecimalPart;
   }
 
-  unique_nifs = new Set();
-
   addDonation(row: any) {
-    if (!this.unique_nifs.has(row['N.I.F. / C.I.F.'])) {
-      this.unique_nifs.add(row['N.I.F. / C.I.F.']);
-    }
+    this.numberOfDonations++;
     var content = `2182${new Date().getFullYear() - 1}${this.nif}${row['N.I.F. / C.I.F.']}`;
     content = content.padEnd(35);
     if (row['Donante'].trim().length > 40) {
-      console.log('Donante demasiado largo:', row['Donante']);
+      // console.log('Donante demasiado largo:', row['Donante']);
+      this.warnings.push(
+        '- Donante demasiado largo: ' +
+          row['Donante'].trim() +
+          ' Línea ' +
+          (this.numberOfDonations + 1).toString(),
+      );
     }
     content += row['Donante'].trim().slice(0, 40);
     content = content.padEnd(75);
     content += row['Cód. provincia'];
     content += 'A';
-    var donation = row['DINERARIA'] ? row['DINERARIA'] : row['en ESPECIE'];
-    console.log(donation);
-    this.totalDonations += donation;
-    console.log(this.totalDonations);
-    if (
-      row['N.I.F. / C.I.F.'].charAt(0) === 'A' ||
-      row['N.I.F. / C.I.F.'].charAt(0) === 'B'
-    ) {
+
+    var donation = row['en ESPECIE'] ? row['en ESPECIE'] : row['DINERARIA'];
+    let totalDonations = new Decimal(this.totalDonations);
+    let donationAmount = new Decimal(donation);
+    totalDonations = totalDonations.plus(donationAmount);
+    this.totalDonations = totalDonations.toNumber();
+
+    if (row['N.I.F. / C.I.F.'].charAt(0) === 'A' || row['N.I.F. / C.I.F.'].charAt(0) === 'B') {
       content += '04000';
     } else {
       donation <= 250 ? (content += '08000') : (content += '04000');
@@ -240,39 +199,45 @@ export class ConversorService {
 
     this.readDedductions(body);
 
+    this.nif = body.cif;
+
     data.forEach((row) => {
       if (!row['N.I.F. / C.I.F.']) {
         return;
       }
       content += this.addDonation(row);
       content += '\n';
+
+      if (row['DINERARIA'] && row['en ESPECIE']) {
+        row['en ESPECIE'] = null;
+        content += this.addDonation(row);
+        content += '\n';
+      }
     });
 
-    content = this.createFirstLine(body, content) + content;
+    content = this.createFirstLine(content, body.repr, body.tel, body.poc) + content;
 
-    console.log(this.unique_nifs.size);
-    // console.log(content);
+    this.totalDonations = 0;
+    this.numberOfDonations = 0;
 
-    // Define the path where the file will be temporarily saved
-    const filePath = path.join(__dirname, fileName);
+    try {
+      // Simulate file processing and save the result
+      const filename = 'output.txt';
+      const filePath = join(__dirname, filename); // Store in a 'downloads' folder
+      fs.writeFileSync(filePath, content);
 
-    // Write the content to the .txt file
-    fs.writeFileSync(filePath, content);
+      const warnings = this.warnings;
+      return { filePath, fileName, warnings };
+    } catch (error) {
+      throw new Error(`Error processing file: ${error.message}`);
+    }
 
-    // Set headers to trigger a file download in the browser
-    // res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
-    // res.setHeader('Content-Type', 'text/plain');
+    // Write the file to disk
+    // writeFileSync(filePath, content);
+    // console.log('File written to disk:', filePath);
 
-    // // Send the file as a response
-    // res.sendFile(filePath, (err) => {
-    // if (err) {
-    // console.error('Error sending file:', err);
-    // res.status(500).send('Error downloading file');
-    // } else {
-    // // Delete the file after sending it
-    // fs.unlinkSync(filePath);
-    // }
-    // });
+    // Return the file path or a URL that the client can use to download the file
+    // return { filePath, fileName, warnings };
 
     return {
       message: 'File uploaded successfully!',
