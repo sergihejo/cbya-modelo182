@@ -41,3 +41,28 @@
 .formGroup input[type="submit"]:hover {
     background-color: #0056b3;
 }
+
+.loadingScreen {
+    position: fixed;
+    /* Fix it to the viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Semi-transparent dark background */
+    color: white;
+    /* White text */
+    display: flex;
+    /* Flexbox to center the content */
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    font-size: 24px;
+    /* Text size */
+    z-index: 9999;
+    /* Ensure it is on top of other elements */
+}

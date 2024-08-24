@@ -193,8 +193,6 @@ export class ConversorService {
     // Convert sheet to JSON
     const data = XLSX.utils.sheet_to_json(sheet);
 
-    const fileName = 'output.txt';
-
     var content = '';
 
     this.readDedductions(body);
@@ -222,8 +220,8 @@ export class ConversorService {
 
     try {
       // Simulate file processing and save the result
-      const filename = 'output.txt';
-      const filePath = join(__dirname, filename); // Store in a 'downloads' folder
+      const fileName = 'output.txt';
+      const filePath = join(__dirname, fileName); // Store in a 'downloads' folder
       fs.writeFileSync(filePath, content);
 
       const warnings = this.warnings;

@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import styles from './FileUploadForm.module.css';
 
 const FileUploadForm: React.FC = () => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     cif: '',
     repr: '',
@@ -60,11 +61,18 @@ const FileUploadForm: React.FC = () => {
     });
 
     try {
+      console.log('Setting loading to true');
+      setLoading(true);  // Start loading
+      // sleep
+      await new Promise(resolve => setTimeout(resolve, 10000));
+
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/conversor`, data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-	  const file_response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}${response.data.downloadUrl}`);
+      const file_response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}${response.data.downloadUrl}`);
+
+      console.log('Request finished');
 
       const blob = new Blob([file_response.data], { type: file_response.headers['content-type'] });
       const url = URL.createObjectURL(blob);
@@ -81,31 +89,54 @@ const FileUploadForm: React.FC = () => {
         Swal.fire({
           title: 'Advertencias!',
           html: response.data.warnings.join('<br />'),
-		  footer: 'El fichero se ha procesado correctamente, pero debes revisar las advertencias y corregirlas. Se indica el número de línea dentro del txt generado.',
+          footer: 'El fichero se ha procesado correctamente, pero debes revisar las advertencias y corregirlas. Se indica el número de línea correspondiente al fichero output.txt.',
           icon: 'warning',
-          confirmButtonText: 'Cerrar',
+          confirmButtonText: 'Descargar fichero de advertencias',
+          showCancelButton: true,
+          cancelButtonText: 'Cerrar',
+        }).then(result => {
+          if (result.isConfirmed) {
+            const blob = new Blob([response.data.warnings.join('\n')], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'warnings.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+          }
         });
       }
-    } catch (error : any) {
+    } catch (error: any) {
       console.error(error);
-	Swal.fire({
-		title: 'Error!',
-		text: error.response.data.message || error.message,
-		footer: 'Asegúrate de que el archivo subido es un archivo Excel o CSV válido y contiene una hoja llamada "Worksheet" con los datos.',
-		icon: 'error',
-		timer: 10000,
-		timerProgressBar: true,
-		showConfirmButton: false
-	})
+      Swal.fire({
+        title: 'Error!',
+        text: error.response.data.message || error.message,
+        footer: 'Asegúrate de que el archivo subido es un archivo Excel o CSV válido y contiene una hoja llamada "Worksheet" con los datos.',
+        icon: 'error',
+        timer: 10000,
+        timerProgressBar: true,
+        showConfirmButton: false
+      })
+    } finally {
+      console.log('Setting loading to false');
+      setLoading(false);  // End loading
     }
   };
 
   return (
     <div className={styles.formContainer}>
+      {loading &&
+        <div className={styles.loadingScreen}>
+          <p>Loading...</p>
+        </div>
+      }
+
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div className={styles.formGroup}>
           <label htmlFor="cif">CIF:</label>
-          <input type="number" id="cif" name="cif" value={formData.cif} onChange={handleInputChange} />
+          <input type="text" id="cif" name="cif" value={formData.cif} onChange={handleInputChange} />
         </div>
 
         <div className={styles.formGroup}>
