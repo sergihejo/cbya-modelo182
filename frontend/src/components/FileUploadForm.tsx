@@ -60,11 +60,11 @@ const FileUploadForm: React.FC = () => {
     });
 
     try {
-      const response = await axios.post('http://localhost:3001/conversor', data, {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/conversor`, data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-	  const file_response = await axios.get(`http://localhost:3001${response.data.downloadUrl}`);
+	  const file_response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}${response.data.downloadUrl}`);
 
       const blob = new Blob([file_response.data], { type: file_response.headers['content-type'] });
       const url = URL.createObjectURL(blob);
@@ -87,6 +87,7 @@ const FileUploadForm: React.FC = () => {
         });
       }
     } catch (error : any) {
+      console.error(error);
 	Swal.fire({
 		title: 'Error!',
 		text: error.response.data.message || error.message,

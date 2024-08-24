@@ -1,8 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as express from 'express';
-import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,12 +11,8 @@ async function bootstrap() {
     }),
   );
 
-  app.use('/downloads', express.static(join(__dirname, '../downloads')));
-
-  // app.use(bodyParser.urlencoded({ extended: true }));
-
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL,
   });
 
   await app.listen(3001);
