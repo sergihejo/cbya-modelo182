@@ -1,6 +1,6 @@
 .formContainer {
     max-width: 600px;
-    margin: 0 auto;
+    margin: 20px auto;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -26,6 +26,26 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+.contactInfoGroup {
+    display: flex;
+    gap: 10px;
+}
+
+.contactInfoGroup .formGroup {
+    flex: 1 1 50%;
+}
+
+.deductionGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.deductionGroup .formGroup {
+    flex: 1 1 30%;
+    margin-bottom: 15px;
 }
 
 .formGroup input[type="submit"] {

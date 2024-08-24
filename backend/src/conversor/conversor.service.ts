@@ -1,7 +1,6 @@
 import { Body, HttpException, Injectable, UploadedFile } from '@nestjs/common';
 import * as XLSX from 'xlsx';
 import { Decimal } from 'decimal.js';
-import { writeFileSync } from 'fs';
 import { join } from 'path';
 import * as fs from 'fs';
 
@@ -11,7 +10,7 @@ const MODEL = 182;
 export class ConversorService {
   comm_data = require('./poblaciones.json');
 
-  nif: number;
+  cif: string;
 
   communities = {
     and: '01',
@@ -39,7 +38,7 @@ export class ConversorService {
   warnings: string[] = [];
 
   createFirstLine(content: string, repr: string, tel: string, poc: string) {
-    content = `1${MODEL}${new Date().getFullYear() - 1}${this.nif}${repr}`;
+    content = `1${MODEL}${new Date().getFullYear() - 1}${this.cif}${repr}`;
     content = content.padEnd(57);
     content += `T${tel}${poc}`;
     content = content.padEnd(107);
@@ -98,7 +97,7 @@ export class ConversorService {
 
   addDonation(row: any) {
     this.numberOfDonations++;
-    var content = `2182${new Date().getFullYear() - 1}${this.nif}${row['N.I.F. / C.I.F.']}`;
+    var content = `2182${new Date().getFullYear() - 1}${this.cif}${row['N.I.F. / C.I.F.']}`;
     content = content.padEnd(35);
     if (row['Donante'].trim().length > 40) {
       // console.log('Donante demasiado largo:', row['Donante']);
@@ -197,7 +196,7 @@ export class ConversorService {
 
     this.readDedductions(body);
 
-    this.nif = body.cif;
+    this.cif = body.cif;
 
     data.forEach((row) => {
       if (!row['N.I.F. / C.I.F.']) {
