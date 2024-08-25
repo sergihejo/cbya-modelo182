@@ -11,6 +11,7 @@ import {
 import { ConversorService } from './conversor.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { CreateConversorDto } from './dto/create-conversor.dto';
 
 @Controller('conversor')
 export class ConversorController {

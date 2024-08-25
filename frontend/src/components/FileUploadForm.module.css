@@ -86,3 +86,9 @@
     z-index: 9999;
     /* Ensure it is on top of other elements */
 }
+
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
