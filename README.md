@@ -1,6 +1,6 @@
 # CBYA182Formatter
 
-CBYA182Formatter es una herramienta web diseñada para formatear y generar archivos compatibles con el modelo 182 de Hacienda, utilizado para declarar donaciones. Este proyecto es parte de la suite de herramientas de [CBYA Auditores](https://cbyaauditores.es) y facilita la creación de los archivos TXT requeridos por la Agencia Tributaria.
+CBYA182Formatter es una herramienta web diseñada para formatear y generar archivos compatibles con el [modelo 182 de Hacienda](https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI02.shtml), utilizado para declarar donaciones. Este proyecto es parte de la suite de herramientas de [CBYA Auditores](https://cbyaauditores.es) y facilita la [creación del archivo TXT](https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_100_199/archivos/182.pdf) requerido por la Agencia Tributaria.
 
 ## Características
 
@@ -8,6 +8,10 @@ CBYA182Formatter es una herramienta web diseñada para formatear y generar archi
 -   **Formulario Web**: Completa la información requerida para el declarante, incluyendo CIF, teléfono, representante y punto de contacto.
 -   **Deducción por Comunidad Autónoma**: Especifica el porcentaje de deducción aplicable.
 -   **Generación de TXT**: Obtendrás un archivo TXT que cumple con los requisitos del modelo 182 de Hacienda.
+
+## Despliegue en Producción
+
+Puedes acceder a la versión en producción de la aplicación en `https://modelo182.cbyaauditores.es`.
 
 ## Instalación y Ejecución en Local
 
@@ -50,10 +54,6 @@ El proyecto se compone de un frontend desarrollado en React y un backend en Nest
 5. **Acceso a la Aplicación**:
 
     La aplicación estará disponible en `http://localhost:3000`.
-
-## Despliegue en Producción
-
-Puedes acceder a la versión en producción de la aplicación en `https://modelo182.cbyaauditores.es`.
 
 ## Contribuciones
 

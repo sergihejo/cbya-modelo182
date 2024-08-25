@@ -219,7 +219,7 @@ export class ConversorService {
 
     try {
       // Simulate file processing and save the result
-      const fileName = 'output.txt';
+      const fileName = `${this.cif}.${MODEL}.txt`;
       const filePath = join(__dirname, fileName); // Store in a 'downloads' folder
       fs.writeFileSync(filePath, content);
 

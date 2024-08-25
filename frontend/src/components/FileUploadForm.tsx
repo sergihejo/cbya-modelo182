@@ -9,7 +9,7 @@ type FormData = {
   repr: string;
   tel: string;
   poc: string;
-  [key: string]: string; // Para permitir llaves dinámicas como ded_
+  [key: string]: string;
 };
 
 const initialFormData: FormData = {
@@ -32,31 +32,13 @@ const initialFormData: FormData = {
   ded_mur: '',
   ded_rioja: '',
   ded_val: '',
+  clear: 'true',
+  show: '',
 };
 
 const FileUploadForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  // const [formData, setFormData] = useState({
-  //   cif: '',
-  //   repr: '',
-  //   tel: '',
-  //   poc: '',
-  //   ded_and: '',
-  //   ded_ar: '',
-  //   ded_ast: '',
-  //   ded_balears: '',
-  //   ded_canarias: '',
-  //   ded_cant: '',
-  //   ded_clm: '',
-  //   ded_cyl: '',
-  //   ded_cat: '',
-  //   ded_ext: '',
-  //   ded_gal: '',
-  //   ded_mad: '',
-  //   ded_mur: '',
-  //   ded_rioja: '',
-  //   ded_val: '',
-  // });
+
   const [formData, setFormData] = useState<FormData>(initialFormData);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -79,17 +61,14 @@ const FileUploadForm: React.FC = () => {
   const validate = () => {
     const errors: { [key: string]: string } = {};
 
-    // Validar CIF
     if (!validateCIF(formData.cif)) {
       errors.cif = 'El CIF debe comenzar por una letra y tener 8 dígitos numéricos.';
     }
 
-    // Validar teléfono
     if (!validatePhoneNumber(formData.tel)) {
       errors.tel = 'El teléfono debe tener 9 dígitos numéricos.';
     }
 
-    // Validar formato de nombres (repr y poc)
     if (!validateNameFormat(formData.repr)) {
       errors.repr = 'El formato debe ser "APELLIDOS, NOMBRE".';
     }
@@ -98,7 +77,6 @@ const FileUploadForm: React.FC = () => {
       errors.poc = 'El formato debe ser "APELLIDOS, NOMBRE".';
     }
 
-    // Validar campos ded_
     Object.keys(formData).forEach((key) => {
       if (key.startsWith('ded_')) {
         if (parseInt(formData[key]) < 0 || parseInt(formData[key]) > 100 || isNaN(parseInt(formData[key]))) {
@@ -117,6 +95,14 @@ const FileUploadForm: React.FC = () => {
     setFormData({
       ...formData,
       [name]: value,
+    });
+  };
+
+  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    setFormData({
+      ...formData,
+      [name]: checked ? 'true' : 'false',
     });
   };
 
@@ -143,7 +129,6 @@ const FileUploadForm: React.FC = () => {
     const data = new FormData();
     data.append('file', file);
 
-    // Append other form data to FormData object
     Object.keys(formData).forEach(key => {
       data.append(key, formData[key as keyof typeof formData]);
     });
@@ -161,11 +146,18 @@ const FileUploadForm: React.FC = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'output.txt';
+      link.download = formData.cif + '.182.txt';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+
+      if (formData.clear === 'true') {
+        setFormData(initialFormData);
+        const fileInput = document.getElementById('file') as HTMLInputElement;
+        fileInput.value = '';
+        setFile(null);
+      }
 
       if (response.data.warnings && response.data.warnings.length > 0) {
         Swal.fire({
@@ -190,8 +182,8 @@ const FileUploadForm: React.FC = () => {
           }
         });
       }
+
     } catch (error: any) {
-      console.error(error);
       Swal.fire({
         title: 'Error!',
         text: error.response.data.message || error.message,
@@ -202,31 +194,6 @@ const FileUploadForm: React.FC = () => {
         showConfirmButton: false
       })
     } finally {
-      setFormData({
-        cif: '',
-        repr: '',
-        tel: '',
-        poc: '',
-        ded_and: '',
-        ded_ar: '',
-        ded_ast: '',
-        ded_balears: '',
-        ded_canarias: '',
-        ded_cant: '',
-        ded_clm: '',
-        ded_cyl: '',
-        ded_cat: '',
-        ded_ext: '',
-        ded_gal: '',
-        ded_mad: '',
-        ded_mur: '',
-        ded_rioja: '',
-        ded_val: '',
-      });
-      const fileInput = document.getElementById('file') as HTMLInputElement;
-      fileInput.value = '';
-      setFile(null);
-
       setLoading(false);
     }
   };
@@ -366,6 +333,13 @@ const FileUploadForm: React.FC = () => {
         <div className={styles.formGroup}>
           <label htmlFor="file">Fichero:</label>
           <input type="file" id="file" name="file" onChange={handleFileChange} />
+        </div>
+
+        <div className={styles.formGroup}>
+          <div className={styles.checkboxContainer}>
+            <input type="checkbox" id="clear" name="clear" checked={formData.clear === 'true'} onChange={handleCheckboxChange} />
+            <label htmlFor="clear">Borrar campos al enviar</label>
+          </div>
         </div>
 
         <div className={styles.formGroup}>

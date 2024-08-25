@@ -92,3 +92,12 @@
     font-size: 14px;
     margin-top: 5px;
 }
+
+.checkboxContainer {
+    display: flex;
+    align-items: center;
+}
+
+.checkboxContainer input[type="checkbox"] {
+    margin-right: 8px;
+}
