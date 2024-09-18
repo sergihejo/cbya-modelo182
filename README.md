@@ -1,6 +1,6 @@
-# CBYA182Formatter
+# CBYA-MODELO182
 
-CBYA182Formatter es una herramienta web diseñada para formatear y generar archivos compatibles con el [modelo 182 de Hacienda](https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI02.shtml), utilizado para declarar donaciones. Este proyecto es parte de la suite de herramientas de [CBYA Auditores](https://cbyaauditores.es) y facilita la [creación del archivo TXT](https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_100_199/archivos/182.pdf) requerido por la Agencia Tributaria.
+CBYA-Modelo182 es una herramienta web diseñada para formatear y **generar archivos compatibles con el [modelo 182 de Hacienda](https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI02.shtml)**, utilizado para declarar donaciones. Este proyecto es propiedad de **[CBYA Auditores](https://cbyaauditores.es)** y facilita la [creación del archivo TXT](https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_100_199/archivos/182.pdf) requerido por la Agencia Tributaria.
 
 ## Características
 
@@ -27,8 +27,8 @@ El proyecto se compone de un frontend desarrollado en React y un backend en Nest
 1. **Clona el repositorio**:
 
     ```bash
-    git clone https://github.com/sergihejo/CBYA182Formatter.git
-    cd CBYA182Formatter
+    git clone https://github.com/sergihejo/cbya-modelo182.git
+    cd cbya-modelo182
     ```
 
 2. **Instala las dependencias**:
@@ -57,7 +57,7 @@ El proyecto se compone de un frontend desarrollado en React y un backend en Nest
 
 ## Contribuciones
 
-Si deseas contribuir a este proyecto, por favor, abre un "issue" o un "pull request" en GitHub.
+Si deseas contribuir a este proyecto, por favor, abre un [issue](https://github.com/sergihejo/cbya-modelo182/issues) o un [pull request](https://github.com/sergihejo/cbya-modelo182/pulls) en GitHub.
 
 ## Licencia
 
