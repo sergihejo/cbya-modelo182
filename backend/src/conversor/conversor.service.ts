@@ -220,11 +220,16 @@ export class ConversorService {
     try {
       // Simulate file processing and save the result
       const fileName = `${this.cif}.${MODEL}.txt`;
-      const filePath = join(__dirname, fileName); // Store in a 'downloads' folder
-      fs.writeFileSync(filePath, content);
+      const rootDir = join(__dirname, 'downloads'); // Define a safe root directory
+      const filePath = join(rootDir, fileName); // Store in a 'downloads' folder
+      const normalizedPath = fs.realpathSync(filePath);
+      if (!normalizedPath.startsWith(rootDir)) {
+        throw new Error('Invalid file path');
+      }
+      fs.writeFileSync(normalizedPath, content);
 
       const warnings = this.warnings;
-      return { filePath, fileName, warnings };
+      return { filePath: normalizedPath, fileName, warnings };
     } catch (error) {
       throw new Error(`Error processing file: ${error.message}`);
     }
