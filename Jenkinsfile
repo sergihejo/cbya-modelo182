@@ -36,25 +36,5 @@ pipeline {
                 sh 'cp -r backend/dist /home/ubuntu/cbya-prettier/'
             }
         }
-
-        // stage('Sand discord notification') {
-            // steps {
-                // script {
-                    // def payload = '{"content": "Successfully deployed. Check it [here](https://jenkins-flyant.asociacionaspa.es/job/FlyAntWebsite/lastBuild/)"}'
-                    // sh "curl -s -H \"Accept: application/json\" -H \"Content-Type:application/json\" -X POST --data '${payload}' https://discord.com/api/webhooks/1255244249809813605/BSA04-QS0EyqjLIBY-wGWLwJeyFp-oK9sTUwW1CHpxkYDhPs-RKMqlEoFRNndVYR3mzF"
-                // }
-            // }
-        // }
-
     }
-
-    // post {
-    //     failure {
-    //         // Configure notifications if required, e.g., email, Slack, etc.
-    //             script {
-    //                 def payload = '{"content": "Failed to deploy. Check it [here](https://jenkins-flyant.asociacionaspa.es/job/FlyAntWebsite/lastUnsuccessfulBuild/)"}'
-    //                 sh "curl -s -H \"Accept: application/json\" -H \"Content-Type:application/json\" -X POST --data '${payload}' https://discord.com/api/webhooks/1255244244889767987/opIZqLGYEpeffj1C_qe8I7M3DQ6SPRFGjnEbNKdj8dLQE-8HG_1eg-5w7ZMIe3S9TREc"
-    //             }
-    //     }
-    // }
 }

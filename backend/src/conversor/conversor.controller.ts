@@ -33,7 +33,6 @@ export class ConversorController {
     @Query('fileName') fileName: string,
     @Res() res: Response,
   ) {
-    console.log('Downloading file:', filePath);
     res.download(filePath, fileName, (err) => {
       if (err) {
         console.error('Error downloading the file:', err);

@@ -218,32 +218,20 @@ export class ConversorService {
     this.numberOfDonations = 0;
 
     try {
-      // Simulate file processing and save the result
-      const fileName = `${this.cif}.${MODEL}.txt`;
-      const rootDir = join(__dirname, 'downloads'); // Define a safe root directory
-      const filePath = join(rootDir, fileName); // Store in a 'downloads' folder
-      const normalizedPath = fs.realpathSync(filePath);
-      if (!normalizedPath.startsWith(rootDir)) {
-        throw new Error('Invalid file path');
+      const sanitize = require('sanitize-filename');
+      const safeCif = sanitize(this.cif);
+      if (!safeCif) {
+        throw new Error('Invalid file name components');
       }
-      fs.writeFileSync(normalizedPath, content);
+
+      const fileName = `${safeCif}.${MODEL}.txt`;
+      const filePath = join(__dirname, fileName);
+      fs.writeFileSync(filePath, content);
 
       const warnings = this.warnings;
-      return { filePath: normalizedPath, fileName, warnings };
+      return { filePath, fileName, warnings };
     } catch (error) {
       throw new Error(`Error processing file: ${error.message}`);
     }
-
-    // Write the file to disk
-    // writeFileSync(filePath, content);
-    // console.log('File written to disk:', filePath);
-
-    // Return the file path or a URL that the client can use to download the file
-    // return { filePath, fileName, warnings };
-
-    return {
-      message: 'File uploaded successfully!',
-      content, // Returning the parsed data for demonstration
-    };
   }
 }
